@@ -3,9 +3,46 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SIZE 30
+#define SIZE 31
 
 typedef unsigned char matrice[SIZE][SIZE];
+
+
+char verificaMini(matrice tabel, int x, int y) {
+    char castigator=2;
+    //verifica linii
+    for(int i=x;i<=x+2;i++){
+        if((tabel[i][y]==tabel[i][y+1]) && (tabel[i][y]==tabel[i][y+2])){
+            castigator = tabel[i][y];
+            return castigator;
+        }
+    }
+
+    //verifica coloane
+    for(int i=y;i<=y+2;i++){
+        if((tabel[x][i]==tabel[x+1][i]) && (tabel[x][i]==tabel[x+2][i])){
+            castigator = tabel[x][i];
+            return castigator;
+        }
+    }
+
+
+    //verifica diagonale
+        if((tabel[x][y]==tabel[x+1][y+1]) && (tabel[x][y]==tabel[x+2][y+2])){
+            castigator = tabel[x][y]; 
+        } else {
+            if((tabel[x][y+2]==tabel[x+1][y+1]) && (tabel[x][y+2]==tabel[x+2][y])){
+                castigator = tabel[x][y]; 
+                return castigator;
+            }
+        }
+
+    return castigator;
+}
+
+void castigatorMini(matrice tabel, int X, int Y, int castigator) {
+    if(tabel[30][X+Y/3]==2) tabel[30][X+Y/3] = castigator;
+}
 
 int valabil(matrice tabel, int x, int y) {
     return (tabel[x][y] == 2) ? 1 : 0;
@@ -28,9 +65,11 @@ int coordonateValide(matrice tabel, int n, int x, int y) {
 int plaseaza(matrice tabel, int x, int y, char simbol) {
     if (simbol == 'X') {
         tabel[x][y] = 1;
+        castigatorMini(tabel, x-(x%3), y-(y%3), verificaMini(tabel, x-(x%3), y- (y%3)));
         return 1;
     } else {
         tabel[x][y] = 0;
+        castigatorMini(tabel, x-(x%3), y-(y%3), verificaMini(tabel, x-(x%3), y- (y%3)));
         return 1;
     }
     return 0;
@@ -82,6 +121,7 @@ void citesteMutari(matrice tabel, int n) {
         scanf(" %c", & player);
         scanf("%d", & x);
         scanf("%d", & y);
+
         if (player != last) {
             last = player;
             if (coordonateValide(tabel, n * 3, x, y)) {
@@ -93,7 +133,6 @@ void citesteMutari(matrice tabel, int n) {
             }
         } else {
             printf("NOT YOUR TURN\n");
-            i--;
         }
     }
 }
@@ -108,6 +147,55 @@ void afiseazaTabel(matrice tabel, int n) {
     }
 }
 
+
+void afisareMacro(matrice tabel, int n) {
+    for(int i=0;i<n*3;i++) {
+        if(tabel[30][i]==1) {
+            printf("X");
+        } else if(tabel[30][i]==0) {
+            printf("0");
+        } else {
+            printf("-");
+        }
+        if(i%n==n-1) printf("\n");
+    }
+    printf("\n");
+}
+
+char verificareMacro(matrice tabel, int n) {
+    int cx=0, c0=0;
+
+    // verificare verticala
+    for(int i=0; i<n*3-3; i+=3) {
+        if(tabel[30][i]==tabel[30][i+1] && tabel[30][i]==tabel[30][i+2]) {
+            if(tabel[30][i]==1) cx++;
+            else if(tabel[30][i]==0) c0++;
+        }
+    }
+
+    // verificare orizontala
+
+    for(int i=0; i<n; i++) {
+        if(tabel[30][i]==tabel[30][i+3] && tabel[30][i]==tabel[30][i+6]) {
+            if(tabel[30][i]==1) cx++;
+            else if(tabel[30][i]==0) c0++;
+        }
+    }
+
+    // verificare diagonala principala
+
+     for(int i=0; i<n*3-3; i+=3) {
+        if(tabel[30][i]==tabel[30][i+3] && tabel[30][i]==tabel[30][i+6]) {
+            if(tabel[30][i]==1) cx++;
+            else if(tabel[30][i]==0) c0++;
+        }
+    }
+
+    if(cx>c0) return 1;
+    else if(cx<c0) return 0;
+    else return 2;
+}
+
 int main() {
     matrice tabel;
     int n;
@@ -116,7 +204,12 @@ int main() {
 
     scanf("%d", & n); // citeste dimensiunea tabelului
     citesteMutari(tabel, n);
-    afiseazaTabel(tabel, n);
+    afisareMacro(tabel, n);
+
+    char castigator = verificareMacro(tabel,n);
+    if(castigator==1) printf("X won\n");
+    else if(castigator==0) printf("0 won\n");
+    else printf("Draw again! Let’s play darts!\n");
 
     return 0;
 }
