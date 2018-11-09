@@ -13,9 +13,18 @@ run:
 		./$(EXE)
 
 # make zip with my homework
-# pack:
-#        zip -FSr homework_template.zip README Makefile *.c *.h
+pack:
+	zip -FSr tema.zip README Makefile *.c *.h
+.PHONY:pack
+
 
 clean:
 	rm -f $(EXE)
-                               
+
+.PHONY:clean
+
+beautify: 
+	clang-format -i -style=Google $(SOURCE)
+
+.PHONY:beautify
+	
