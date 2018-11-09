@@ -14,7 +14,8 @@ run:
 
 # make zip with my homework
 pack:
-	zip -FSr tema.zip README Makefile *.c *.h
+	zip -FSr 312CA_GramaNicolae_Tema2.zip README Makefile *.c *.h
+	
 .PHONY:pack
 
 

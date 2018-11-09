@@ -63,7 +63,7 @@ int cautaSpatiuLiber(matrice tabel, int n, char simbol) {
         }
     } while ((sus != 9 || jos != 9) && x == 0 && y == 0);
 
-    if(sus==9 && jos==9) {
+    if (sus == 9 && jos == 9) {
         printf("FULL BOARD\n");
         return 0;
     } else {
@@ -75,20 +75,25 @@ int cautaSpatiuLiber(matrice tabel, int n, char simbol) {
 
 void citesteMutari(matrice tabel, int n) {
     int m, i, x, y;
-    char player;
+    char player, last = '0';
 
     scanf("%d", & m); // citeste  numarul de mutari
     for (i = 0; i < m; i++) {
         scanf(" %c", & player);
         scanf("%d", & x);
         scanf("%d", & y);
-
-        if (coordonateValide(tabel, n * 3, x, y)) {
-            plaseaza(tabel, x, y, player);
-        } else {
-            if(!cautaSpatiuLiber(tabel, n * 3, player)) {
-                break;
+        if (player != last) {
+            last = player;
+            if (coordonateValide(tabel, n * 3, x, y)) {
+                plaseaza(tabel, x, y, player);
+            } else {
+                if (!cautaSpatiuLiber(tabel, n * 3, player)) {
+                    break;
+                }
             }
+        } else {
+            printf("NOT YOUR TURN\n");
+            i--;
         }
     }
 }
