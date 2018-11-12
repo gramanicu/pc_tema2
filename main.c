@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #define SIZE 101
 
@@ -69,7 +70,9 @@ char verificaMini(matrice tabel, int x, int y, int n) {
     int count = 1;
     char c = mini[0][0];
     for (int i = 1; i < n; i++) {
-        if (mini[i][i] == c) count++;
+        if (mini[i][i] == c) { 
+            count++;
+        }
     }
     if (count == n) {
         return c;
@@ -121,7 +124,7 @@ int plaseaza(matrice tabel, int x, int y, char simbol, int n) {
         tabel[x][y] = 1;
         castigatorMini(tabel, x - (x % n), y - (y % n), verificaMini(tabel, x - (x % n), y - (y % n), n), n);
         return 1;
-    } else {
+    } else if(simbol == '0') {
         tabel[x][y] = 0;
         castigatorMini(tabel, x - (x % n), y - (y % n), verificaMini(tabel, x - (x % n), y - (y % n), n), n);
         return 1;
@@ -131,7 +134,6 @@ int plaseaza(matrice tabel, int x, int y, char simbol, int n) {
 
 int cautaSpatiuLiber(matrice tabel, int n, char simbol) {
     int sus = 0, jos = 0, turn = 0, x = 0, y = 0;
-
     do {
         if (turn == 0) {
             for (int i = 0; i < n - jos; i++) {
@@ -160,7 +162,7 @@ int cautaSpatiuLiber(matrice tabel, int n, char simbol) {
         printf("FULL BOARD\n");
         return 0;
     } else {
-        plaseaza(tabel, x, y, simbol, n);
+        plaseaza(tabel, x, y, simbol, sqrt(n));
     }
 
     return 1;
@@ -181,8 +183,10 @@ void citesteMutari(matrice tabel, int n) {
             if (coordonateValide(tabel, n * n, x, y)) {
                 plaseaza(tabel, x, y, player, n);
             } else {
-                if (!cautaSpatiuLiber(tabel, n * n, player)) {
-                    break;
+                if(!valabil(tabel,x,y)) {
+                    if (!cautaSpatiuLiber(tabel, n * n, player)) {
+                        break;
+                    }
                 }
             }
         } else {
@@ -309,6 +313,7 @@ int main() {
     scanf("%d", & n); // citeste dimensiunea tabelului
     citesteMutari(tabel, n);
     afisareMacro(tabel, n);
+
     char castigator = verificareMacro(tabel, n);
     if (castigator == 1)
         printf("X won\n");
