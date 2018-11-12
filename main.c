@@ -157,11 +157,26 @@ void afisareMacro(matrice tabel, int n) {
         } else {
             printf("-");
         }
-        if(i%n==n-1) printf("\n");
+        if(i%n == n-1) printf("\n");
     }
     printf("\n");
 }
 
+void afiseazaMacroVector(matrice tabel, int n) {
+    for(int i=0; i<n*3;i++) {
+        printf("%d ", tabel[30][i]);
+    }
+    printf("\n");
+}
+
+/*
+Pentru a face verificarile corecte, trebuie luat in calcul si cazul 
+matricei macro 1*1 sau 2*2.
+De asemenea, codul trebuie evaluat pentru cazuri mai mari de 3*3, 
+dar chiar si de 3*3.
+In ultimul rand, codul de diag principala e gresit iar cel de diag secundara
+nu exista
+*/
 char verificareMacro(matrice tabel, int n) {
     int cx=0, c0=0;
 
@@ -205,6 +220,8 @@ int main() {
     scanf("%d", & n); // citeste dimensiunea tabelului
     citesteMutari(tabel, n);
     afisareMacro(tabel, n);
+
+    afiseazaMacroVector(tabel, n);
 
     char castigator = verificareMacro(tabel,n);
     if(castigator==1) printf("X won\n");
