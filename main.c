@@ -6,6 +6,7 @@
 #define SIZE 31
 
 typedef unsigned char matrice[SIZE][SIZE];
+typedef unsigned char vector[SIZE];
 
 
 char verificaMini(matrice tabel, int x, int y) {
@@ -30,9 +31,10 @@ char verificaMini(matrice tabel, int x, int y) {
     //verifica diagonale
         if((tabel[x][y]==tabel[x+1][y+1]) && (tabel[x][y]==tabel[x+2][y+2])){
             castigator = tabel[x][y]; 
+            return castigator;
         } else {
             if((tabel[x][y+2]==tabel[x+1][y+1]) && (tabel[x][y+2]==tabel[x+2][y])){
-                castigator = tabel[x][y]; 
+                castigator = tabel[x][y+2]; 
                 return castigator;
             }
         }
@@ -169,41 +171,74 @@ void afiseazaMacroVector(matrice tabel, int n) {
     printf("\n");
 }
 
-/*
-Pentru a face verificarile corecte, trebuie luat in calcul si cazul 
-matricei macro 1*1 sau 2*2.
-De asemenea, codul trebuie evaluat pentru cazuri mai mari de 3*3, 
-dar chiar si de 3*3.
-In ultimul rand, codul de diag principala e gresit iar cel de diag secundara
-nu exista
-*/
+void vectorToMatrice(vector v, matrice m, int n) {
+    for(int i=0; i<n; i++) {
+        for(int j=0; j<n; j++) {
+            m[i][j] = v[i*n+j];
+
+        }
+    }
+}
+
 char verificareMacro(matrice tabel, int n) {
     int cx=0, c0=0;
-
-    // verificare verticala
-    for(int i=0; i<n*3-3; i+=3) {
-        if(tabel[30][i]==tabel[30][i+1] && tabel[30][i]==tabel[30][i+2]) {
-            if(tabel[30][i]==1) cx++;
-            else if(tabel[30][i]==0) c0++;
-        }
-    }
+    matrice macro;
+    
+    vectorToMatrice(tabel[30], macro, n);
+    
 
     // verificare orizontala
-
     for(int i=0; i<n; i++) {
-        if(tabel[30][i]==tabel[30][i+3] && tabel[30][i]==tabel[30][i+6]) {
-            if(tabel[30][i]==1) cx++;
-            else if(tabel[30][i]==0) c0++;
+        int count=1;
+        char c = macro[i][0];
+        for(int j=1; j<n; j++) {
+            if(macro[i][j]==c) count++;
+        }
+
+        if(count == n) {
+            if(macro[i][0]==1) cx++;
+            else if(macro[i][0]==0) c0++;
         }
     }
+
+    // verificare verticala
+    for(int i=0; i<n; i++) {
+        int count=1;
+        char c = macro[0][i];
+        for(int j=1; j<n; j++) {
+            if(macro[j][i]==c) count++;
+        }
+
+        if(count == n) {
+            if(macro[0][i]==1) cx++;
+            else if(macro[0][i]==0) c0++;
+        }
+    }
+
 
     // verificare diagonala principala
 
-     for(int i=0; i<n*3-3; i+=3) {
-        if(tabel[30][i]==tabel[30][i+3] && tabel[30][i]==tabel[30][i+6]) {
-            if(tabel[30][i]==1) cx++;
-            else if(tabel[30][i]==0) c0++;
-        }
+    int count=1;
+    char c = macro[0][0];
+    for(int i=1; i<n; i++) {
+        if(macro[i][i]==c) count++;
+    }
+
+    if(count == n) {
+        if(macro[0][0]==1) cx++;
+        else if(macro[0][0]==0) c0++;
+    }
+
+    //verifica diagonala secundara
+    count=1;
+    c = macro[0][n-1];
+    for(int i=1; i<n; i++) {
+        if(macro[i][n-i-1]==c) count++;
+    }
+
+    if(count == n) {
+        if(macro[0][n-1]==1) cx++;
+        else if(macro[0][n-1]==0) c0++;
     }
 
     if(cx>c0) return 1;
@@ -219,9 +254,8 @@ int main() {
 
     scanf("%d", & n); // citeste dimensiunea tabelului
     citesteMutari(tabel, n);
+    afiseazaTabel(tabel, n);
     afisareMacro(tabel, n);
-
-    afiseazaMacroVector(tabel, n);
 
     char castigator = verificareMacro(tabel,n);
     if(castigator==1) printf("X won\n");
