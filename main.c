@@ -20,6 +20,7 @@ int coordonateValide(int n, int x, int y);
 int cautaSpatiuLiber(matrice tabel, int n, int *col, int *line);
 int castigatoare(matrice tabel, matrice macro, int n, int x, int y);
 int situatie(matrice mini, matrice macro, int n, int x, int y);
+char castigator(matrice macro, int n);
 
 // MAIN
 
@@ -34,12 +35,18 @@ int main() {
 
     citesteMutari(tabel, macro, n);
     afiseazaTabel(macro, n);
-    // afiseazaTabel(tabel, n * n);
+    char winner = castigator(macro, n);
+    if (winner == -1) {
+        printf("Draw again! Let's play darts!\n");
+    } else {
+        printf("%c won\n", winner);
+    }
     return 0;
 }
 
 // FUNCTIONS
 
+// Destul de "self-explanatory" XD
 void plaseaza(matrice tabel, int x, int y, char simbol) {
     tabel[x][y] = simbol;
 }
@@ -235,8 +242,8 @@ int cautaSpatiuLiber(matrice tabel, int n, int *line, int *col) {
 }
 
 /*  Functie de citire a mutarilor. Dupa ce face toate verificarile (inclusiv
-   daca casuta e valida si sa caute un loc liber in caz negativ), efectueaza
-   mutarea. Daca nu a gasit niciun loc liber, inseamna ca jocul s-a terminat
+    daca casuta e valida si sa caute un loc liber in caz negativ), efectueaza
+    mutarea. Daca nu a gasit niciun loc liber, inseamna ca jocul s-a terminat
 */
 int citesteMutari(matrice tabel, matrice macro, int n) {
     int m, i, x, y;
@@ -273,4 +280,87 @@ int citesteMutari(matrice tabel, matrice macro, int n) {
         }
     }
     return 0;  // Au fost citite toate mutarile - jocul e terminat
+}
+
+//  Functie de verificare pentru cine a castigat runda
+char castigator(matrice macro, int n) {
+    int pX = 0, p0 = 0;
+    // verificare orizontala
+    for (int i = 0; i < n; i++) {
+        int count = 1;
+        char c = macro[i][0];
+        if (c != -1) {
+            for (int j = 1; j < n; j++) {
+                if (macro[i][j] == c) {
+                    count++;
+                }
+            }
+            if (count == n) {
+                if (c == '0')
+                    p0++;
+                else
+                    pX++;
+            }
+        }
+    }
+
+    // verificare verticala
+    for (int i = 0; i < n; i++) {
+        int count = 1;
+        char c = macro[0][i];
+        if (c != -1) {
+            for (int j = 1; j < n; j++) {
+                if (macro[j][i] == c) {
+                    count++;
+                }
+            }
+            if (count == n) {
+                if (c == '0')
+                    p0++;
+                else
+                    pX++;
+            }
+        }
+    }
+
+    // verificare diagonala principala
+
+    int count = 1;
+    char c = macro[0][0];
+    if (c != -1) {
+        for (int i = 1; i < n; i++) {
+            if (macro[i][i] == c) {
+                count++;
+            }
+        }
+        if (count == n) {
+            if (c == '0')
+                p0++;
+            else
+                pX++;
+        }
+    }
+
+    // verifica diagonala secundara
+    count = 1;
+    c = macro[0][n - 1];
+    if (c != -1) {
+        for (int i = 1; i < n; i++) {
+            if (macro[i][n - i - 1] == c) {
+                count++;
+            }
+        }
+        if (count == n) {
+            if (c == '0')
+                p0++;
+            else
+                pX++;
+        }
+    }
+
+    if (p0 > pX)
+        return '0';
+    else if (p0 < pX)
+        return 'X';
+    return -1;
 }
