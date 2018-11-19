@@ -1,5 +1,6 @@
 // Copyright 2018 Grama Nicolae
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,22 +13,28 @@ typedef char matrice[SIZE][SIZE];
 
 void afiseazaTabel(matrice tabel, int n);
 void plaseaza(matrice tabel, int x, int y, char simbol);
-int citesteMutari(matrice tabel, int n);
+void transforma(matrice sursa, matrice target, int n, int x, int y);
+int citesteMutari(matrice tabel, matrice macro, int n);
 int valabil(matrice tabel, int x, int y);
 int coordonateValide(int n, int x, int y);
 int cautaSpatiuLiber(matrice tabel, int n, int *col, int *line);
+int castigatoare(matrice tabel, matrice macro, int n, int x, int y);
+int situatie(matrice mini, matrice macro, int n, int x, int y);
 
 // MAIN
 
 int main() {
     matrice tabel;
+    matrice macro;
     memset(tabel, -1, sizeof(tabel));
+    memset(macro, -1, sizeof(macro));
 
     int n;
     scanf("%d", &n);
 
-    citesteMutari(tabel, n);
-    afiseazaTabel(tabel, n * n);
+    citesteMutari(tabel, macro, n);
+    afiseazaTabel(macro, n);
+    // afiseazaTabel(tabel, n * n);
     return 0;
 }
 
@@ -45,13 +52,121 @@ void afiseazaTabel(matrice tabel, int n) {
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
             if (tabel[i][j] != -1) {
-                printf("%c ", tabel[i][j]);
+                printf("%c", tabel[i][j]);
             } else {
-                printf("- ");
+                printf("-");
             }
         }
         printf("\n");
     }
+}
+
+/*  O functie folosita pentru a simplifica anumite calcule, mutand
+    informatiile dintr-un minijoc din matricea mare intr-o matrice
+    mai mica. Pentru a putea face acest transfer, are nevoie de
+    coordonatele din coltul din stanga sus, al minijocului.
+*/
+void transforma(matrice sursa, matrice target, int n, int x, int y) {
+    int linie = 0, col = 0;
+    for (int i = x; i < n + x; i++) {
+        for (int j = y; j < n + y; j++) {
+            target[linie][col++] = sursa[i][j];
+        }
+        col = 0;
+        linie++;
+    }
+}
+
+/*  Intrucat se cauta coordonatele unui mini-tabel in tabelul
+    mare, e nevoie sa scoatem radical din dimensiunea n, pentru
+    a afla dimensiunea unui tabel mic (n-ul original, din input)
+*/
+void coordonateMini(int n, int *x, int *y) {
+    *x = *x - (*x % n);
+    *y = *y - (*y % n);
+}
+
+//  Functie care evalueaza situatia in tabelul mini
+int situatie(matrice mini, matrice macro, int n, int x, int y) {
+    // verificare orizontala
+    for (int i = 0; i < n; i++) {
+        int count = 1;
+        char c = mini[i][0];
+        if (c != -1) {
+            for (int j = 1; j < n; j++) {
+                if (mini[i][j] == c) {
+                    count++;
+                }
+            }
+            if (count == n) {
+                return valabil(macro, x, y);
+            }
+        }
+    }
+
+    // verificare verticala
+    for (int i = 0; i < n; i++) {
+        int count = 1;
+        char c = mini[0][i];
+        if (c != -1) {
+            for (int j = 1; j < n; j++) {
+                if (mini[j][i] == c) {
+                    count++;
+                }
+            }
+            if (count == n) {
+                return valabil(macro, x, y);
+            }
+        }
+    }
+
+    // verificare diagonala principala
+
+    int count = 1;
+    char c = mini[0][0];
+    if (c != -1) {
+        for (int i = 1; i < n; i++) {
+            if (mini[i][i] == c) {
+                count++;
+            }
+        }
+        if (count == n) {
+            return valabil(macro, x, y);
+        }
+    }
+
+    // verifica diagonala secundara
+    count = 1;
+    c = mini[0][n - 1];
+    if (c != -1) {
+        for (int i = 1; i < n; i++) {
+            if (mini[i][n - i - 1] == c) {
+                count++;
+            }
+        }
+        if (count == n) {
+            return valabil(macro, x, y);
+        }
+    }
+
+    return 0;
+}
+
+/*  Functie care verifica daca a fost castigat un joc mic
+    (si daca mutarea a fost castigatoare). Daca gaseste
+    un joc castigat, il updateaza in tabelul macro. Daca nu
+    e nimic de updatat in macro, inseamna ca mutarea nu a fost
+    castigatoare.
+*/
+int castigatoare(matrice tabel, matrice macro, int n, int x, int y) {
+    matrice mini;
+    int i = x;
+    int j = y;
+    coordonateMini(n, &i, &j);
+    transforma(tabel, mini, n, i, j);
+    i = i / n;
+    j = j / n;
+    return situatie(mini, macro, n, i, j);
 }
 
 // Verifica daca o casuta este libera si returneaza 1 in caz
@@ -123,8 +238,7 @@ int cautaSpatiuLiber(matrice tabel, int n, int *line, int *col) {
    daca casuta e valida si sa caute un loc liber in caz negativ), efectueaza
    mutarea. Daca nu a gasit niciun loc liber, inseamna ca jocul s-a terminat
 */
-
-int citesteMutari(matrice tabel, int n) {
+int citesteMutari(matrice tabel, matrice macro, int n) {
     int m, i, x, y;
     char player, last = '0';
 
@@ -148,6 +262,12 @@ int citesteMutari(matrice tabel, int n) {
                 }
             }
             plaseaza(tabel, x, y, player);  // Efectueaza mutarea
+            if (castigatoare(tabel, macro, n, x, y)) {
+                coordonateMini(n, &x, &y);
+                x = x / n;
+                y = y / n;
+                plaseaza(macro, x, y, player);
+            }
         } else {
             printf("NOT YOUR TURN\n");
         }
