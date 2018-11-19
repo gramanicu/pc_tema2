@@ -44,7 +44,7 @@ void afiseazaTabel(matrice tabel, int n) {
     int i, j;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-            if(tabel[i][j]!=-1) {
+            if (tabel[i][j] != -1) {
                 printf("%c ", tabel[i][j]);
             } else {
                 printf("- ");
@@ -56,9 +56,7 @@ void afiseazaTabel(matrice tabel, int n) {
 
 // Verifica daca o casuta este libera si returneaza 1 in caz
 // afirmativ, respectiv 0
-int valabil(matrice tabel, int x, int y) { 
-    return (tabel[x][y] == -1) ? 1 : 0; 
-}
+int valabil(matrice tabel, int x, int y) { return (tabel[x][y] == -1) ? 1 : 0; }
 
 /*  Valideaza coordonatele :
         1. Sunt mai mari sau egale cu 0
@@ -141,20 +139,18 @@ int citesteMutari(matrice tabel, int n) {
                 if (!valabil(tabel, x, y)) {
                     printf("NOT AN EMPTY CELL\n");
                     if (!cautaSpatiuLiber(tabel, n * n, &x, &y)) {
-                        // Daca nu a gasit spatiu liber, inseamna ca jocul s-a
-                        // terminat
-                        return 0;  // Nu mai citeste alte mutari
+                        return 0;  // Jocul s-a terminat
                     }
                 }
             } else {
-               if(!cautaSpatiuLiber(tabel, n * n, &x, &y)) {
-                   return 0;
-               }
+                if (!cautaSpatiuLiber(tabel, n * n, &x, &y)) {
+                    return 0;  // La fel ca mai sus
+                }
             }
-            plaseaza(tabel, x, y, player);
+            plaseaza(tabel, x, y, player);  // Efectueaza mutarea
         } else {
             printf("NOT YOUR TURN\n");
         }
     }
-    return 0;
+    return 0;  // Au fost citite toate mutarile - jocul e terminat
 }
