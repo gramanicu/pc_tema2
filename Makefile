@@ -35,7 +35,7 @@ beauty:
 # descarca arhiva de teste si o pregateste
 update:
 	wget https://ocw.cs.pub.ro/courses/_media/programare/teme_2018/check_gigel.zip
-	unzip check_gigel.zip -d ./checker
+	unzip -o check_gigel.zip -d ./checker
 	rm -f check_gigel.zip*
 
 .PHONY:update
