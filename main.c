@@ -14,7 +14,8 @@ typedef char matrice[SIZE][SIZE];
 void afiseazaTabel(matrice tabel, int n);
 void plaseaza(matrice tabel, int x, int y, char simbol);
 void transforma(matrice sursa, matrice target, int n, int x, int y);
-int citesteMutari(matrice tabel, matrice macro, int n);
+int citesteMutari(matrice tabel, matrice macro, int n, int *mX, int *m0,
+                  int *wX, int *w0);
 int valabil(matrice tabel, int x, int y);
 int coordonateValide(int n, int x, int y);
 int cautaSpatiuLiber(matrice tabel, int n, int *col, int *line);
@@ -31,9 +32,11 @@ int main() {
     memset(macro, -1, sizeof(macro));
 
     int n;
+    int mX = 0, m0 = 0;  // total mutari
+    int wX = 0, w0 = 0;  // mutari castigatoare
     scanf("%d", &n);
 
-    citesteMutari(tabel, macro, n);
+    citesteMutari(tabel, macro, n, &mX, &m0, &wX, &w0);
     afiseazaTabel(macro, n);
     char winner = castigator(macro, n);
     if (winner == -1) {
@@ -41,6 +44,21 @@ int main() {
     } else {
         printf("%c won\n", winner);
     }
+
+    double coeficientX, coeficient0;
+    if (mX != 0) {
+        coeficientX = (double)wX / (double)mX;
+        printf("X %.10lf\n", coeficientX);
+    } else {
+        printf("X N/A\n");
+    }
+    if (m0 != 0) {
+        coeficient0 = (double)w0 / (double)m0;
+        printf("0 %.10lf\n", coeficient0);
+    } else {
+        printf("0 N/A\n");
+    }
+
     return 0;
 }
 
@@ -244,9 +262,13 @@ int cautaSpatiuLiber(matrice tabel, int n, int *line, int *col) {
 /*  Functie de citire a mutarilor. Dupa ce face toate verificarile (inclusiv
     daca casuta e valida si sa caute un loc liber in caz negativ), efectueaza
     mutarea. Daca nu a gasit niciun loc liber, inseamna ca jocul s-a terminat
+
+    Tot aici se calculeaza si numarul de mutari efectuate de fiecare jucator
+    si cate din ele au fost castigatoare
 */
-int citesteMutari(matrice tabel, matrice macro, int n) {
-    int m, i, x, y;
+int citesteMutari(matrice tabel, matrice macro, int n, int *mX, int *m0,
+                  int *wX, int *w0) {
+    int m, i, x, y, aleasa;
     char player, last = '0';
 
     scanf("%d", &m);  // Citeste  numarul de mutari
@@ -254,6 +276,7 @@ int citesteMutari(matrice tabel, matrice macro, int n) {
         scanf(" %c", &player);
         scanf("%d", &x);
         scanf("%d", &y);
+        aleasa = 0;
         if (player != last) {  // Verifica daca a facut mutarea cine era la rand
             last = player;
             if (coordonateValide(n * n, x, y)) {
@@ -262,6 +285,8 @@ int citesteMutari(matrice tabel, matrice macro, int n) {
                     if (!cautaSpatiuLiber(tabel, n * n, &x, &y)) {
                         return 0;  // Jocul s-a terminat
                     }
+                } else {  // A fost o mutare aleasa
+                    aleasa = 1;
                 }
             } else {
                 if (!cautaSpatiuLiber(tabel, n * n, &x, &y)) {
@@ -269,16 +294,28 @@ int citesteMutari(matrice tabel, matrice macro, int n) {
                 }
             }
             plaseaza(tabel, x, y, player);  // Efectueaza mutarea
+            if (player == '0') {
+                (*m0)++;
+            } else {
+                (*mX)++;
+            }
             if (castigatoare(tabel, macro, n, x, y)) {
                 coordonateMini(n, &x, &y);
                 x = x / n;
                 y = y / n;
                 plaseaza(macro, x, y, player);
+                if (aleasa) {
+                    if (player == '0')
+                        (*w0)++;
+                    else
+                        (*wX)++;
+                }
             }
         } else {
             printf("NOT YOUR TURN\n");
         }
     }
+
     return 0;  // Au fost citite toate mutarile - jocul e terminat
 }
 
