@@ -29,3 +29,8 @@ beautify:
 
 .PHONY:beautify
 	
+update:
+	wget https://ocw.cs.pub.ro/courses/_media/programare/teme_2018/check_gigel.zip
+	unzip check_gigel.zip -d /checker
+
+.PHONY: update
