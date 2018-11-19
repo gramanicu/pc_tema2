@@ -11,17 +11,17 @@ typedef char matrice[SIZE][SIZE];
 // HEADERS
 
 void afiseazaTabel(matrice tabel, int n);
+void plaseaza(matrice tabel, int x, int y, char simbol);
+int citesteMutari(matrice tabel, int n);
 int valabil(matrice tabel, int x, int y);
 int coordonateValide(int n, int x, int y);
 int cautaSpatiuLiber(matrice tabel, int n, int *col, int *line);
-void citesteMutari(matrice tabel, int n);
-void plaseaza(matrice tabel, int x, int y, char simbol);
 
 // MAIN
 
 int main() {
     matrice tabel;
-    memset(tabel, 0, sizeof(tabel));
+    memset(tabel, -1, sizeof(tabel));
 
     int n;
     scanf("%d", &n);
@@ -44,7 +44,11 @@ void afiseazaTabel(matrice tabel, int n) {
     int i, j;
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-            printf("%c ", tabel[i][j]);
+            if(tabel[i][j]!=-1) {
+                printf("%c ", tabel[i][j]);
+            } else {
+                printf("- ");
+            }
         }
         printf("\n");
     }
@@ -52,7 +56,9 @@ void afiseazaTabel(matrice tabel, int n) {
 
 // Verifica daca o casuta este libera si returneaza 1 in caz
 // afirmativ, respectiv 0
-int valabil(matrice tabel, int x, int y) { return (tabel[x][y] == 0) ? 1 : 0; }
+int valabil(matrice tabel, int x, int y) { 
+    return (tabel[x][y] == -1) ? 1 : 0; 
+}
 
 /*  Valideaza coordonatele :
         1. Sunt mai mari sau egale cu 0
@@ -75,7 +81,7 @@ int coordonateValide(int n, int x, int y) {
     si returneaza 1
 */
 int cautaSpatiuLiber(matrice tabel, int n, int *line, int *col) {
-    int sus = 0, jos = 0, turn = 0, x = 0, y = 0;
+    int sus = 1, jos = 0, turn = 0, x = -1, y = -1;
     do {
         if (turn == 0) {
             for (int i = 0; i < n - jos; i++) {
@@ -102,7 +108,7 @@ int cautaSpatiuLiber(matrice tabel, int n, int *line, int *col) {
             sus++;
             turn = 0;
         }
-    } while ((sus != n || jos != n) && x == 0 && y == 0);
+    } while ((sus != n || jos != n) && (x == -1 && y == -1));
 
     if (sus == n && jos == n) {
         printf("FULL BOARD\n");
@@ -119,7 +125,8 @@ int cautaSpatiuLiber(matrice tabel, int n, int *line, int *col) {
    daca casuta e valida si sa caute un loc liber in caz negativ), efectueaza
    mutarea. Daca nu a gasit niciun loc liber, inseamna ca jocul s-a terminat
 */
-void citesteMutari(matrice tabel, int n) {
+
+int citesteMutari(matrice tabel, int n) {
     int m, i, x, y;
     char player, last = '0';
 
@@ -128,21 +135,26 @@ void citesteMutari(matrice tabel, int n) {
         scanf(" %c", &player);
         scanf("%d", &x);
         scanf("%d", &y);
-
         if (player != last) {  // Verifica daca a facut mutarea cine era la rand
             last = player;
             if (coordonateValide(n * n, x, y)) {
                 if (!valabil(tabel, x, y)) {
-                    if (!cautaSpatiuLiber(tabel, n, &x, &y)) {
+                    printf("NOT AN EMPTY CELL\n");
+                    if (!cautaSpatiuLiber(tabel, n * n, &x, &y)) {
                         // Daca nu a gasit spatiu liber, inseamna ca jocul s-a
                         // terminat
-                        break;  // Nu mai citeste alte mutari
+                        return 0;  // Nu mai citeste alte mutari
                     }
                 }
-                plaseaza(tabel, x, y, player);
+            } else {
+               if(!cautaSpatiuLiber(tabel, n * n, &x, &y)) {
+                   return 0;
+               }
             }
+            plaseaza(tabel, x, y, player);
         } else {
             printf("NOT YOUR TURN\n");
         }
     }
+    return 0;
 }

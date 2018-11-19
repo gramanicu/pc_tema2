@@ -46,14 +46,10 @@ styleCheck:
 
 .PHONY: styleCheck
 
-# verifica toata tema, cu ajutorul checkerului
-check:
+# pregateste tema pentru verificarea cu checkerul
+prepare:
 	cp README.md ./checker/README.md
 	cp main.c ./checker/$(SOURCE)
 	cp Makefile ./checker/Makefile
-	-bash ./checker/check.sh
-	rm -f ./checker/README.md
-	rm -f ./checker/$(SOURCE)
-	rm -f ./checker/Makefile
 	
-.PHONY: check
+.PHONY: prepare
