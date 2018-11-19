@@ -20,13 +20,13 @@ void afiseazaTabel(matrice tabel, int n) {
 }
 
 void matriceToMini(matrice original, matrice m, int x, int y, int n) {
-    int ox=0, oy=0;
+    int ox = 0, oy = 0;
     for (int i = x; i < x + n; i++) {
         for (int j = y; j < y + n; j++) {
             m[ox][oy] = original[i][j];
             oy++;
-            if(oy==n) {
-                oy=0;
+            if (oy == n) {
+                oy = 0;
                 ox++;
             }
         }
@@ -70,7 +70,7 @@ char verificaMini(matrice tabel, int x, int y, int n) {
     int count = 1;
     char c = mini[0][0];
     for (int i = 1; i < n; i++) {
-        if (mini[i][i] == c) { 
+        if (mini[i][i] == c) {
             count++;
         }
     }
@@ -96,7 +96,7 @@ char verificaMini(matrice tabel, int x, int y, int n) {
 // Functia care seteaza castigatorul unei matrici, in functie de coltul
 // din stanga sus
 void castigatorMini(matrice tabel, int X, int Y, int castigator, int n) {
-    if(castigator!=2) {
+    if (castigator != 2) {
         if (tabel[100][X + Y / n] == 2) tabel[100][X + Y / n] = castigator;
     }
 }
@@ -124,7 +124,7 @@ int plaseaza(matrice tabel, int x, int y, char simbol, int n) {
         tabel[x][y] = 1;
         castigatorMini(tabel, x - (x % n), y - (y % n), verificaMini(tabel, x - (x % n), y - (y % n), n), n);
         return 1;
-    } else if(simbol == '0') {
+    } else if (simbol == '0') {
         tabel[x][y] = 0;
         castigatorMini(tabel, x - (x % n), y - (y % n), verificaMini(tabel, x - (x % n), y - (y % n), n), n);
         return 1;
@@ -140,6 +140,8 @@ int cautaSpatiuLiber(matrice tabel, int n, char simbol) {
                 if (valabil(tabel, jos + i, i)) {
                     x = i + jos;
                     y = i;
+                    sus = 0;
+                    jos = 0;
                     break;
                 }
             }
@@ -150,15 +152,17 @@ int cautaSpatiuLiber(matrice tabel, int n, char simbol) {
                 if (valabil(tabel, i, i + sus)) {
                     x = i;
                     y = i + sus;
+                    sus = 0;
+                    jos = 0;
                     break;
                 }
             }
             sus++;
             turn = 0;
         }
-    } while ((sus != 9 || jos != 9) && x == 0 && y == 0);
+    } while ((sus != n || jos != n) && x == 0 && y == 0);
 
-    if (sus == 9 && jos == 9) {
+    if (sus == n && jos == n) {
         printf("FULL BOARD\n");
         return 0;
     } else {
@@ -180,12 +184,14 @@ void citesteMutari(matrice tabel, int n) {
 
         if (player != last) {
             last = player;
-            if (coordonateValide(tabel, n * n, x, y)) {
-                plaseaza(tabel, x, y, player, n);
-            } else {
-                if(!valabil(tabel,x,y)) {
-                    if (!cautaSpatiuLiber(tabel, n * n, player)) {
-                        break;
+            if (x >= 0 && y >= 0) {
+                if (coordonateValide(tabel, n * n, x, y)) {
+                    plaseaza(tabel, x, y, player, n);
+                } else {
+                    if (!valabil(tabel, x, y)) {
+                        if (!cautaSpatiuLiber(tabel, n * n, player)) {
+                            break;
+                        }
                     }
                 }
             }
@@ -206,7 +212,6 @@ void afisareMacro(matrice tabel, int n) {
         }
         if (i % n == n - 1) printf("\n");
     }
-    printf("\n");
 }
 
 void afiseazaMacroVector(matrice tabel, int n) {
@@ -313,6 +318,7 @@ int main() {
     scanf("%d", & n); // citeste dimensiunea tabelului
     citesteMutari(tabel, n);
     afisareMacro(tabel, n);
+    afiseazaTabel(tabel, n * n);
 
     char castigator = verificareMacro(tabel, n);
     if (castigator == 1)
