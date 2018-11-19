@@ -15,7 +15,9 @@ run: build
 
 # arhiveaza tema
 pack:
+	cp README.md README
 	zip -FSr 312CA_GramaNicolae_Tema2.zip README Makefile *.c *.h
+	rm -f README
 	
 .PHONY:pack
 
@@ -48,7 +50,7 @@ styleCheck:
 
 # pregateste tema pentru verificarea cu checkerul
 prepare:
-	cp README.md ./checker/README.md
+	cp README.md ./checker/README
 	cp main.c ./checker/$(SOURCE)
 	cp Makefile ./checker/Makefile
 	
