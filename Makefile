@@ -27,10 +27,10 @@ clean:
 
 # face coding-style automat, la standardul google, cu o mica modificare
 # (4 spatii in loc de 2 la alineate)
-beautify: 
+beauty: 
 	clang-format -i -style=file $(SOURCE)
 
-.PHONY:beautify
+.PHONY:beauty
 
 # descarca arhiva de teste si o pregateste
 update:
