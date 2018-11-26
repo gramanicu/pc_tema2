@@ -34,7 +34,9 @@ int main() {
     int n;
     int mX = 0, m0 = 0;  // total mutari
     int wX = 0, w0 = 0;  // mutari castigatoare
-    scanf("%d", &n);
+    if (!scanf("%d", &n)) {
+        exit(0);
+    }
 
     citesteMutari(tabel, macro, n, &mX, &m0, &wX, &w0);
     afiseazaTabel(macro, n);
@@ -271,11 +273,19 @@ int citesteMutari(matrice tabel, matrice macro, int n, int *mX, int *m0,
     int m, i, x, y, aleasa;
     char player, last = '0';
 
-    scanf("%d", &m);  // Citeste  numarul de mutari
+    if (!scanf("%d", &m)) {
+        exit(0);
+    }  // Citeste  numarul de mutari
     for (i = 0; i < m; i++) {
-        scanf(" %c", &player);
-        scanf("%d", &x);
-        scanf("%d", &y);
+        if (!scanf(" %c", &player)) {
+            exit(0);
+        }
+        if (!scanf("%d", &x)) {
+            exit(0);
+        }
+        if (!scanf("%d", &y)) {
+            exit(0);
+        }
         aleasa = 0;
         if (player != last) {  // Verifica daca a facut mutarea cine era la rand
             last = player;

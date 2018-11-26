@@ -1,7 +1,7 @@
 # Copyright 2018 Grama Nicolae
 
 CC = gcc
-CFLAGS = -lm -Wall -Wextra -std=c99
+CFLAGS = -lm -Wall -Wextra -std=c99 -O3
 EXE = gigel
 SOURCE = main.c
 
